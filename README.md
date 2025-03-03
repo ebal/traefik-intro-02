@@ -6,6 +6,8 @@ a blog post series to my homelab
 
 check here for [Introduction to Traefik - Part One](https://github.com/ebal/traefik-intro-01)
 
+check here for [Introduction to Traefik - Part Three](https://github.com/ebal/traefik-intro-03)
+
 ## Part Two
 
 In this blog post series, I will connect several docker containers and a virtual machine behind the Traefik reverse proxy on my homelab, and set up Let's Encrypt for TLS. In this post, I will connect our first docker container to the Traefik reverse proxy for testing and to learn how to do this.
@@ -13,7 +15,6 @@ In this blog post series, I will connect several docker containers and a virtual
 I've also made a short video to accompany this blog post:
 
 [![Watch the video](https://img.youtube.com/vi/GZVjYUNOh-I/maxresdefault.jpg)](https://youtu.be/GZVjYUNOh-I)
-
 
 ## WhoAmI?
 
