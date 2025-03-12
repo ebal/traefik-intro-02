@@ -1,6 +1,6 @@
 # Introduction to Traefik - Part Two
 
-a blog post series to my homelab
+a blog post series about my homelab.
 
 ![Traefik](https://balaskas.gr/blog/fp-content/images/d23d82a2.png)
 
@@ -18,7 +18,7 @@ I've also made a short video to accompany this blog post:
 
 ## WhoAmI?
 
-Traefik, whoami is often used as a simple test service to demonstrate how Traefik handles routing, especially when using dynamic routing and reverse proxy setups.
+Traefik, **whoami** is often used as a simple test service to demonstrate how Traefik handles routing, especially when using dynamic routing and reverse proxy setups.
 
 ```yaml
   # A container that exposes an API to show its IP address
@@ -26,7 +26,6 @@ Traefik, whoami is often used as a simple test service to demonstrate how Traefi
     image: traefik/whoami
     container_name: whoami
     hostname: whoami
-
 ```
 
 our updated docker compose file should look like:
@@ -41,7 +40,7 @@ services:
     container_name: traefik
     hostname: traefik
     env_file:
-      - path: ./.env
+      - path: ./default.env
         required: true
     restart: unless-stopped
     ports:
@@ -50,7 +49,9 @@ services:
       # The HTTP port
       - 80:80
     volumes:
+      # The configuration directory for traefik
       - ./traefik:/etc/traefik
+      # So that Traefik can listen to other Docker Containers
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   # A container that exposes an API to show its IP address
@@ -58,7 +59,6 @@ services:
     image: traefik/whoami
     container_name: whoami
     hostname: whoami
-
 ```
 
 Start all the services
@@ -97,10 +97,8 @@ We have not yet changed our traefik configuration file to enable an EntryPoint. 
 
 So let's go back one step.
 
-
 ```bash
 docker compose down
-
 ```
 
 ## Traefik Configuration
@@ -151,7 +149,6 @@ This is how to enable the DEBUG (or INFO - just replace the verb in level)
 log:
   filePath: /etc/traefik/traefik.log
   level: DEBUG
-
 ```
 
 ### Docker provider
@@ -164,7 +161,6 @@ providers:
   docker: {
     exposedByDefault: false
   }
-  
 ```
 
 ## Traefik Configuration file updated
@@ -173,9 +169,7 @@ and now **traefik/traefik.yml** looks like:
 
 ```yaml
 # The /ping health-check URL
-ping: {
-
-}
+ping:
 
 # API and dashboard configuration
 api:
@@ -198,7 +192,6 @@ providers:
     docker: {
         exposedByDefault: false
     }
-
 ```
 
 by running 
@@ -208,6 +201,8 @@ docker compose up traefik -d
 ```
 
 we can review Traefik dashboard with the new web EntryPoint and ping
+
+http://localhost:8080/dashboard/
 
 ![Traefik Web EntryPoint](storage/Traefik_Web_EntryPoint.png)
 
@@ -239,7 +234,7 @@ services:
     container_name: traefik
     hostname: traefik
     env_file:
-      - path: ./.env
+      - path: ./default.env
         required: true
     restart: unless-stopped
     ports:
@@ -260,7 +255,6 @@ services:
         - "traefik.enable=true" # To enable whoami to Traefik
         - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)" # Declare the host rule for this service
         - "traefik.http.routers.whoami.entrypoints=web" # Declare the EntryPoint
-
 ```
 
 `docker compose up -d`
@@ -278,19 +272,23 @@ Hostname: whoami
 IP: 127.0.0.1
 IP: ::1
 IP: 172.19.0.3
-RemoteAddr: 172.19.0.2:41276
+RemoteAddr: 172.19.0.2:47392
 GET / HTTP/1.1
 Host: whoami.localhost
 User-Agent: curl/8.12.1
 Accept: */*
 Accept-Encoding: gzip
-X-Forwarded-For: 172.19.0.1
+X-Forwarded-For: 192.168.65.1
 X-Forwarded-Host: whoami.localhost
 X-Forwarded-Port: 80
 X-Forwarded-Proto: http
 X-Forwarded-Server: traefik
-X-Real-Ip: 172.19.0.1
+X-Real-Ip: 192.168.65.1
 ```
+
+http://whoami.localhost/
+
+![WhoAmI Localhost](storage/Traefik_whoami_localhost.png)
 
 ## Health Checks and Depends
 
@@ -317,7 +315,6 @@ and we can extend the Traefik service to include this
       retries: 3
       timeout: 10s
       start_period: 10s
-
 ```
 
 ### Depends On
@@ -339,7 +336,7 @@ services:
     container_name: traefik
     hostname: traefik
     env_file:
-      - path: ./.env
+      - path: ./default.env
         required: true
     restart: unless-stopped
     ports:
@@ -369,7 +366,6 @@ services:
         - "traefik.enable=true"                                       # To enable whoami to Traefik
         - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)" # Declare the host rule for this service
         - "traefik.http.routers.whoami.entrypoints=web"               # Declare the EntryPoint
-
 ```
 
 ![Traefik WhoAmI](storage/Traefik_whoami.png)
